@@ -13,6 +13,7 @@ Framework Jenkins
       branch = "master"
       url_git = "https://github.com/matiasgonzalocalvo/FrameworkJenkins"
       env.folder = "devops"
+      framework = "framework.groovy"
       sh "mkdir -p ${folder}"
       dir ("${folder}")
       {
@@ -21,7 +22,7 @@ Framework Jenkins
           branch: "${branch}"
         )
       }
-      devops = load "devops/framework.groovy"
+      devops = load "${folder}/${framework}"
       devops.main()
     }
   }
