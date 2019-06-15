@@ -83,9 +83,7 @@ def set_branch()
 }
 def set_global_environment()
 {
-  echo "datas == ${datas} || datas.global == ${datas.global}"
   super_variables = evaluate "datas.global.env"
-  echo "super_variables == ${super_variables}"
   for ( yaml_variables in super_variables )
   {
     for ( yaml_variable in yaml_variables ) {
