@@ -1,0 +1,32 @@
+- global:
+    env:
+      - name: name_variable_gobal_1
+        value: value_variable_gobal_1
+      - name: name_variable_gobal_2
+        value: value_variable_gobal_2
+
+- master:
+    branch_wildcard:
+      - branch: prod
+      - branch: feature/*
+    env:
+      - name: name_variable1_master
+        value: value_variable1_master
+      - name: name_variable2_master
+        value: value_variable2_master
+    stages:
+      - stage: maven_read_version_pom
+      - stage: maven_install
+
+- develop:
+    branch_wildcard:
+      - branch: develop
+      - branch: testing/*
+    env:
+      - name: name_variable1_develop
+        value: value_variable1_develop
+      - name: name_variable2_develop
+        value: value_variable2_develop
+    stages:
+      - stage: maven_read_version_pom
+      - stage: maven_install

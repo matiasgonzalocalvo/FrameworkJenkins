@@ -1,0 +1,10 @@
+- pipeline: v1
+  master:
+    env:
+      - name: name_variable1
+        value: value_variable1
+      - name: name_variable2
+        value: value_variable2
+    stages:
+      - stage: maven_read_version_pom
+      - stage: maven_install
