@@ -13,7 +13,7 @@ Framework Jenkins
       branch = "master"
       url_git = "https://github.com/matiasgonzalocalvo/FrameworkJenkins"
       env.folder = "devops"
-      sh "mkdir -p devops"
+      sh "mkdir -p ${folder}"
       dir ("${folder}")
       {
         git(
