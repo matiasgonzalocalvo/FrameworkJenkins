@@ -1,106 +1,46 @@
-def cargo_stages() 
+env.pipeline_folder="pipeline"
+env.dir_framework = "${folder}/framework/"
+env.global_framework="${dir_framework}/global_framework.groovy"
+def load_framework()
 {
   /*
     la variable folder tiene que ser seteada en el Jenkinsfile si no no va a funcionar
   */
-  env.global_stages="${folder}/global_stages.groovy"
-  env.dir_stages = "${folder}/stages"
   // CLEAN DE GLOBAL STAGES
   sh """
-      echo "" > ${global_stages}
+      #!/bin/bash
+      if [ -e "${global_framework}" ] ; then
+        rm ${global_framework}
+      fi
   """
   // CHARGE GLOBAL STAGES
-  final foundFiles = sh(script: 'find ${dir_stages} -type f', returnStdout: true).split()
+  final foundFiles = sh(script: 'find ${dir_framework} -type f', returnStdout: true).split()
   foundFiles.each {
     print it
     sh """
       #!/bin/bash
-      cat ${it} >> ${global_stages}
+      cat ${it} >> ${global_framework}
     """
   }
   // LOAD ALL STAGES
-  stages = load "${global_stages}"
-}
-def read_yaml()
-{
-  env.yaml_name = sh(script: ''' cat .git/config |grep -i url |awk -F"/" '{printf $NF}'|sed 's/.git/.yaml/g' ''', returnStdout: true)
-  datas = readYaml file: "${folder}/configuration/${yaml_name}"
-}
-def set_environments()
-{
-  super_variables = evaluate "datas.${branch_config}.env"
-  for ( yaml_variables in super_variables )
-  {
-    for ( yaml_variable in yaml_variables ) {
-      evaluate "env.${yaml_variable.name}=\"${yaml_variable.value}\""
-    }
-  }
-}
-def exec_stages()
-{
-  super_stages = evaluate "datas.${branch_config}.stages"
-  for ( stages in super_stages )
-  {
-    for ( stage in stages )
-    {
-      evaluate "stages.${stage.stage}()"
-    }
-  }
-}
-def set_branch()
-{
-  for ( i in datas )
-  {
-    for ( j in i )
-    {
-      if ( j.key != "global" ) 
-      {
-        for ( brancheo in j )
-        {
-          if ( brancheo.key == BRANCH_NAME ) 
-          {
-            env.branch_config="${brancheo.key}"
-            break;
-          }
-          else
-          {
-            for ( b_wildcard in brancheo.value )
-            {
-              for ( wildcard in b_wildcard.value ) 
-              {
-                if ( BRANCH_NAME =~ wildcard.branch )
-                {
-                  env.branch_config="${brancheo.key}"
-                  break;
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
-def set_global_environment()
-{
-  super_variables = evaluate "datas.global.env"
-  for ( yaml_variables in super_variables )
-  {
-    for ( yaml_variable in yaml_variables ) {
-      //echo "yaml_variable.name == ${yaml_variable.name} || yaml_variable.value == ${yaml_variable.value}"
-      evaluate "env.${yaml_variable.name}=\"${yaml_variable.value}\""
-    }
-  }
-
+  framework = load "${global_framework}"
 }
 def main()
 {
-  cargo_stages()
-  read_yaml()
-  set_global_environment()
-  set_branch()
-  set_environments()
-  exec_stages()
-  sh "export"
+  load_framework()
+  framework.cargo_stages()
+  framework.read_yaml()
+  framework.set_global_environment()
+  framework.set_branch()
+  if ( framework.credentials_to_variable("passphrase", "passphrase") )
+  {
+    framework.set_environments_secrets()
+  }
+  else
+  {
+    echo "si hay secrets no se van a utilizar por que no existe el secret passphrase generar este secret en el jenkins para poder desifrar los secrets"
+  }
+  framework.set_environments()
+  framework.exec_stages()
 }
 return this
