@@ -2,6 +2,7 @@ Framework Jenkins
 ===================
 ## Roadmap ##
 1 - Agregar nuevo modulo que se llame flow que englobe varios stages standar por ejemplo compilar + test unitarios + sonar + generar docker etc
+2 - Fix gpg Passphrase sacar al pedo esta
 ## Jenkinsfile ##
   ```groovy
   node ("master")
